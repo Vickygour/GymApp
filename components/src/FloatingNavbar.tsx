@@ -1,72 +1,104 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { Home, ClipboardList, Dumbbell, Utensils, User } from 'lucide-react';
 
 type TabType = 'Home' | 'Plans' | 'Exercise' | 'Diet' | 'Profile';
 
 export default function FloatingNavbar() {
-  const [activeTab, setActiveTab] = useState<TabType>('Exercise');
+  const pathname = usePathname();
+
+  // Mapping current URL to Tab IDs
+  const getActiveTab = (): TabType => {
+    if (pathname === '/home') return 'Home';
+    if (pathname.includes('/plans')) return 'Plans';
+    if (pathname.includes('/ExercisePlannerPage')) return 'Exercise'; // Updated route
+    if (pathname.includes('/diet')) return 'Diet';
+    if (pathname.includes('/profile')) return 'Profile';
+    return 'Home';
+  };
+
+  const activeTab = getActiveTab();
 
   const navItems = [
-    { id: 'Home' as TabType, icon: Home, label: 'HOME' },
-    { id: 'Plans' as TabType, icon: ClipboardList, label: 'PLANS' },
-    { id: 'Exercise' as TabType, icon: Dumbbell, label: 'EXERCISE' },
-    { id: 'Diet' as TabType, icon: Utensils, label: 'DIET' },
-    { id: 'Profile' as TabType, icon: User, label: 'PROFILE' },
+    { id: 'Home' as TabType, icon: Home, label: 'HOME', href: '/home' },
+    {
+      id: 'Plans' as TabType,
+      icon: ClipboardList,
+      label: 'PLANS',
+      href: '/plans',
+    },
+    {
+      id: 'Exercise' as TabType,
+      icon: Dumbbell,
+      label: 'WORKOUT',
+      href: '/ExercisePlannerPage',
+    }, // Updated Link
+    { id: 'Diet' as TabType, icon: Utensils, label: 'DIET', href: '/diet' },
+    {
+      id: 'Profile' as TabType,
+      icon: User,
+      label: 'PROFILE',
+      href: '/profile',
+    },
   ];
 
   return (
-    <div className="fixed bottom-6 left-6 right-6 z-50">
-      {/* Main Bar Container */}
-      <div className="bg-white/95 backdrop-blur-2xl border border-white/20 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] rounded-[2.5rem] px-3 h-[80px] flex justify-around items-center max-w-md mx-auto relative">
+    <div className="fixed bottom-6 left-6 right-6 z-[100]">
+      <div className="bg-white/90 backdrop-blur-2xl border border-slate-100 shadow-[0_20px_50px_rgba(21,93,252,0.15)] rounded-[2.5rem] px-3 h-[80px] flex justify-around items-center max-w-md mx-auto relative">
         {navItems.map((item) => {
           const isActive = activeTab === item.id;
           const Icon = item.icon;
 
           return (
-            <div
+            <Link
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className="relative flex flex-col items-center justify-center h-full w-full cursor-pointer"
+              href={item.href}
+              className="relative flex flex-col items-center justify-center h-full w-full cursor-pointer group"
             >
-              {/* The Floating Square Box */}
+              {/* Floating Square Box */}
               <div
                 className={`
                   flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]
                   ${
                     isActive
-                      ? 'bg-blue-600 w-[64px] h-[64px] rounded-[1.25rem] -translate-y-[42px] shadow-2xl shadow-blue-300 border-[6px] border-[#F8FAFC] text-white scale-100'
-                      : 'w-12 h-12 bg-transparent translate-y-0 text-slate-400 hover:text-slate-500 hover:scale-110'
+                      ? 'bg-[#155DFC] w-[60px] h-[60px] rounded-[1.5rem] -translate-y-[38px] shadow-2xl shadow-[#155DFC]/40 border-[5px] border-white text-white'
+                      : 'w-12 h-12 bg-transparent translate-y-0 text-slate-400 group-hover:text-slate-600'
                   }
                 `}
               >
                 <Icon
-                  size={isActive ? 28 : 24}
+                  size={isActive ? 26 : 22}
                   strokeWidth={isActive ? 2.5 : 2}
-                  className="transition-transform duration-300"
                 />
               </div>
 
-              {/* Label Text - Balanced Position */}
+              {/* Label Text */}
               <span
                 className={`
-                  absolute transition-all duration-300 font-black text-[10px] tracking-widest
+                  absolute transition-all duration-300 font-black text-[9px] tracking-widest
                   ${
                     isActive
-                      ? 'bottom-2 opacity-100 text-blue-600 translate-y-0'
-                      : 'bottom-3 opacity-40 text-slate-400 translate-y-0'
+                      ? 'bottom-3 opacity-100 text-[#155DFC] translate-y-0'
+                      : 'bottom-4 opacity-40 text-slate-400 translate-y-1 group-hover:translate-y-0 group-hover:opacity-100'
                   }
                 `}
               >
                 {item.label}
               </span>
 
-              {/* Active Indicator Line */}
+              {/* Smooth Active Indicator Line */}
               {isActive && (
-                <div className="absolute bottom-0 w-6 h-1 bg-blue-600 rounded-t-full" />
+                <motion.div
+                  layoutId="nav-line"
+                  className="absolute bottom-1 w-5 h-1 bg-[#155DFC] rounded-full"
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                />
               )}
-            </div>
+            </Link>
           );
         })}
       </div>
