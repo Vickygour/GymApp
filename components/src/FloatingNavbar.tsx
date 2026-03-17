@@ -11,11 +11,10 @@ type TabType = 'Home' | 'Plans' | 'Exercise' | 'Diet' | 'Profile';
 export default function FloatingNavbar() {
   const pathname = usePathname();
 
-  // Mapping current URL to Tab IDs
   const getActiveTab = (): TabType => {
     if (pathname === '/home') return 'Home';
     if (pathname.includes('/plans')) return 'Plans';
-    if (pathname.includes('/ExercisePlannerPage')) return 'Exercise'; // Updated route
+    if (pathname.includes('/ExercisePlannerPage')) return 'Exercise';
     if (pathname.includes('/diet')) return 'Diet';
     if (pathname.includes('/profile')) return 'Profile';
     return 'Home';
@@ -36,7 +35,7 @@ export default function FloatingNavbar() {
       icon: Dumbbell,
       label: 'WORKOUT',
       href: '/ExercisePlannerPage',
-    }, // Updated Link
+    },
     { id: 'Diet' as TabType, icon: Utensils, label: 'DIET', href: '/diet' },
     {
       id: 'Profile' as TabType,
@@ -57,26 +56,45 @@ export default function FloatingNavbar() {
             <Link
               key={item.id}
               href={item.href}
-              className="relative flex flex-col items-center justify-center h-full w-full cursor-pointer group"
+              className="relative flex flex-col items-center justify-center h-full w-full cursor-pointer group outline-none"
             >
-              {/* Floating Square Box */}
-              <div
-                className={`
-                  flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]
-                  ${
-                    isActive
-                      ? 'bg-[#155DFC] w-[60px] h-[60px] rounded-[1.5rem] -translate-y-[38px] shadow-2xl shadow-[#155DFC]/40 border-[5px] border-white text-white'
-                      : 'w-12 h-12 bg-transparent translate-y-0 text-slate-400 group-hover:text-slate-600'
-                  }
-                `}
-              >
-                <Icon
-                  size={isActive ? 26 : 22}
-                  strokeWidth={isActive ? 2.5 : 2}
-                />
+              {/* 1. SMOOTH FLOATING BOX */}
+              {/* isActive check ke andar hum 'motion.div' with layoutId use karenge */}
+              <div className="relative flex items-center justify-center w-12 h-12">
+                {isActive && (
+                  <motion.div
+                    layoutId="active-pill"
+                    className="absolute bg-[#155DFC] w-[60px] h-[60px] rounded-[1.5rem] shadow-2xl shadow-[#155DFC]/40 border-[5px] border-white"
+                    style={{ y: -38 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 350,
+                      damping: 30,
+                    }}
+                  />
+                )}
+
+                {/* 2. ICON WITH COLOR TRANSITION */}
+                <motion.div
+                  animate={{
+                    y: isActive ? -38 : 0,
+                    color: isActive ? '#FFFFFF' : '#94a3b8',
+                  }}
+                  className="relative z-10"
+                  transition={{
+                    type: 'spring',
+                    stiffness: 350,
+                    damping: 30,
+                  }}
+                >
+                  <Icon
+                    size={isActive ? 26 : 22}
+                    strokeWidth={isActive ? 2.5 : 2}
+                  />
+                </motion.div>
               </div>
 
-              {/* Label Text */}
+              {/* 3. LABEL TEXT ANIMATION */}
               <span
                 className={`
                   absolute transition-all duration-300 font-black text-[9px] tracking-widest
@@ -90,7 +108,7 @@ export default function FloatingNavbar() {
                 {item.label}
               </span>
 
-              {/* Smooth Active Indicator Line */}
+              {/* 4. SMOOTH INDICATOR LINE */}
               {isActive && (
                 <motion.div
                   layoutId="nav-line"
