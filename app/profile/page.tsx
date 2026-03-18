@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -15,10 +15,20 @@ import {
   Activity,
   Target,
   Utensils,
+  Camera,
 } from 'lucide-react';
 import FloatingNavbar from '@/components/src/FloatingNavbar';
 
+// Primary Color: #155DFC
+
 export default function ProfilePage() {
+  // Demo State for user info
+  const [userStats] = useState({
+    weight: '72',
+    height: '6.0',
+    bmi: '21.5',
+  });
+
   const containerVariants = {
     hidden: { opacity: 0, y: 15 },
     visible: {
@@ -26,6 +36,11 @@ export default function ProfilePage() {
       y: 0,
       transition: { duration: 0.4, staggerChildren: 0.08 },
     },
+  };
+
+  const handleAction = (type: string) => {
+    console.log(`Navigating to ${type}...`);
+    // Add routing logic here (e.g., router.push)
   };
 
   return (
@@ -45,32 +60,36 @@ export default function ProfilePage() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-2xl bg-slate-50 hover:bg-slate-100"
+              className="rounded-2xl bg-slate-50 hover:bg-[#155DFC]/10 hover:text-[#155DFC] transition-all"
             >
-              <Settings size={22} className="text-slate-600" />
+              <Settings size={22} />
             </Button>
           </header>
 
           {/* MODERN PROFILE HEADER */}
           <section className="flex items-center gap-6 mb-12">
-            <div className="relative">
+            <div className="relative group cursor-pointer">
               <div className="absolute inset-0 bg-[#155DFC]/10 blur-xl rounded-full" />
-              <Avatar className="w-24 h-24 border-[3px] border-white ring-2 ring-[#155DFC]/20 shadow-xl relative">
-                <AvatarImage src="/avatar.png" />
+              <Avatar className="w-24 h-24 border-[3px] border-white ring-2 ring-[#155DFC]/20 shadow-xl relative overflow-hidden">
+                <AvatarImage src="https://github.com/shadcn.png" />
                 <AvatarFallback className="bg-slate-100 text-[#155DFC] font-bold">
                   VG
                 </AvatarFallback>
+                {/* Image Overlay */}
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera size={20} className="text-white" />
+                </div>
               </Avatar>
             </div>
 
             <div className="flex flex-col gap-1">
-              <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+              <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
                 Vicky Gour
               </h2>
               <p className="text-slate-500 text-sm font-medium">
-                vicky@email.com
+                vicky.g@electrician.in
               </p>
-              <Badge className="w-fit mt-1 bg-[#155DFC] hover:bg-[#155DFC]/90 text-white rounded-lg px-4 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+              <Badge className="w-fit mt-1 bg-[#155DFC] hover:bg-[#155DFC] text-white rounded-lg px-4 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-md shadow-[#155DFC]/30">
                 Beginner Level
               </Badge>
             </div>
@@ -78,12 +97,12 @@ export default function ProfilePage() {
 
           {/* STATS STRIP */}
           <div className="grid grid-cols-3 gap-3 mb-10">
-            <StatBox label="Weight" value="72" unit="kg" />
-            <StatBox label="Height" value="6.0" unit="ft" />
-            <StatBox label="BMI" value="21.5" unit="Idx" />
+            <StatBox label="Weight" value={userStats.weight} unit="kg" />
+            <StatBox label="Height" value={userStats.height} unit="ft" />
+            <StatBox label="BMI" value={userStats.bmi} unit="Idx" />
           </div>
 
-          {/* INFO CARDS SECTION */}
+          {/* FITNESS CORE SECTION */}
           <div className="space-y-4 mb-10">
             <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">
               Fitness Core
@@ -111,20 +130,26 @@ export default function ProfilePage() {
           </div>
 
           {/* LIST ACTIONS */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <ActionTile
               icon={<User size={20} />}
               label="Edit Personal Details"
+              onClick={() => handleAction('details')}
             />
             <ActionTile
               icon={<Dumbbell size={20} />}
               label="Custom Workout Plan"
+              onClick={() => handleAction('workout')}
             />
-            <ActionTile icon={<Apple size={20} />} label="Nutrition & Macros" />
+            <ActionTile
+              icon={<Apple size={20} />}
+              label="Nutrition & Macros"
+              onClick={() => handleAction('nutrition')}
+            />
 
             <Button
               variant="ghost"
-              className="w-full justify-center h-14 rounded-3xl text-red-500 hover:bg-red-50 hover:text-red-600 transition-all mt-6 font-bold tracking-tight"
+              className="w-full justify-center h-16 rounded-[2rem] text-red-500 hover:bg-red-50 hover:text-red-600 transition-all mt-6 font-black text-sm uppercase tracking-widest active:scale-95"
             >
               <LogOut size={18} className="mr-2" />
               Sign Out
@@ -132,7 +157,6 @@ export default function ProfilePage() {
           </div>
         </motion.div>
       </div>
-      {/* Navbar ko parent fragment ke andar rakha hai */}
       <FloatingNavbar />
     </>
   );
@@ -150,17 +174,22 @@ function StatBox({
   unit: string;
 }) {
   return (
-    <div className="bg-white border-2 border-slate-50 rounded-3xl p-4 text-center shadow-sm">
-      <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">
+    <motion.div
+      whileHover={{ y: -5 }}
+      className="bg-white border-2 border-slate-50 rounded-[2rem] p-5 text-center shadow-sm"
+    >
+      <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-wider">
         {label}
       </p>
       <div className="flex items-baseline justify-center gap-0.5">
-        <span className="text-xl font-black text-slate-900">{value}</span>
+        <span className="text-2xl font-black text-slate-900 tracking-tighter">
+          {value}
+        </span>
         <span className="text-[10px] text-[#155DFC] font-bold uppercase">
           {unit}
         </span>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -174,38 +203,47 @@ function InfoItem({
   icon: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="p-2 bg-white rounded-full shadow-sm border border-slate-100">
+    <div className="flex flex-col items-center gap-3">
+      <div className="w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center">
         {icon}
       </div>
       <div className="text-center">
-        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mb-0.5">
           {label}
         </p>
-        <p className="text-xs font-black text-slate-800">{value}</p>
+        <p className="text-xs font-black text-slate-800 uppercase">{value}</p>
       </div>
     </div>
   );
 }
 
-function ActionTile({ icon, label }: { icon: React.ReactNode; label: string }) {
+function ActionTile({
+  icon,
+  label,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}) {
   return (
     <motion.div
-      whileHover={{ x: 5 }}
-      className="flex items-center justify-between p-5 bg-white border border-slate-100 rounded-3xl cursor-pointer hover:shadow-md hover:border-[#155DFC]/20 transition-all group"
+      whileTap={{ scale: 0.98 }}
+      onClick={onClick}
+      className="flex items-center justify-between p-5 bg-white border border-slate-100 rounded-[2rem] cursor-pointer hover:shadow-xl hover:shadow-[#155DFC]/5 hover:border-[#155DFC]/20 transition-all group"
     >
       <div className="flex items-center gap-4">
-        <div className="text-slate-400 group-hover:text-[#155DFC] transition-colors">
+        <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-[#155DFC]/10 group-hover:text-[#155DFC] transition-all">
           {icon}
         </div>
-        <span className="text-sm font-bold text-slate-700 tracking-tight">
+        <span className="text-sm font-bold text-slate-700 tracking-tight group-hover:text-slate-900 transition-colors">
           {label}
         </span>
       </div>
-      <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-[#155DFC] transition-colors">
+      <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-[#155DFC] transition-all">
         <ChevronRight
           size={16}
-          className="text-slate-400 group-hover:text-white"
+          className="text-slate-400 group-hover:text-white transition-colors"
         />
       </div>
     </motion.div>

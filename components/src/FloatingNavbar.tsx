@@ -11,13 +11,22 @@ type TabType = 'Home' | 'Plans' | 'Exercise' | 'Diet' | 'Profile';
 export default function FloatingNavbar() {
   const pathname = usePathname();
 
+  // FIX: Pathname ko lowercase mein check karein aur exact match ki jagah includes use karein
   const getActiveTab = (): TabType => {
-    if (pathname === '/home') return 'Home';
-    if (pathname.includes('/plans')) return 'Plans';
-    if (pathname.includes('/ExercisePlannerPage')) return 'Exercise';
-    if (pathname.includes('/diet')) return 'Diet';
-    if (pathname.includes('/profile')) return 'Profile';
-    return 'Home';
+    const path = pathname.toLowerCase();
+
+    if (path.includes('/home')) return 'Home';
+    if (path.includes('/plans')) return 'Plans';
+    // Yahan capital letters ki wajah se match nahi ho raha tha
+    if (path.includes('/exerciseplannerpage')) return 'Exercise';
+    if (path.includes('/diet')) return 'Diet';
+    if (path.includes('/profile')) return 'Profile';
+
+    // Agar landing page '/' par ho to Home active dikhaye,
+    // warna exercise page par home active na dikhaye
+    if (path === '/') return 'Home';
+
+    return 'Home'; // Default fallback
   };
 
   const activeTab = getActiveTab();
@@ -58,8 +67,6 @@ export default function FloatingNavbar() {
               href={item.href}
               className="relative flex flex-col items-center justify-center h-full w-full cursor-pointer group outline-none"
             >
-              {/* 1. SMOOTH FLOATING BOX */}
-              {/* isActive check ke andar hum 'motion.div' with layoutId use karenge */}
               <div className="relative flex items-center justify-center w-12 h-12">
                 {isActive && (
                   <motion.div
@@ -74,7 +81,6 @@ export default function FloatingNavbar() {
                   />
                 )}
 
-                {/* 2. ICON WITH COLOR TRANSITION */}
                 <motion.div
                   animate={{
                     y: isActive ? -38 : 0,
@@ -94,7 +100,6 @@ export default function FloatingNavbar() {
                 </motion.div>
               </div>
 
-              {/* 3. LABEL TEXT ANIMATION */}
               <span
                 className={`
                   absolute transition-all duration-300 font-black text-[9px] tracking-widest
@@ -108,7 +113,6 @@ export default function FloatingNavbar() {
                 {item.label}
               </span>
 
-              {/* 4. SMOOTH INDICATOR LINE */}
               {isActive && (
                 <motion.div
                   layoutId="nav-line"

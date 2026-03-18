@@ -1,65 +1,66 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import {
   Flame,
-  Dumbbell,
   Clock,
-  ChevronRight,
   Zap,
   Target,
+  ChevronDown,
+  Lock,
+  CheckCircle2,
+  Trophy,
 } from 'lucide-react';
 import FloatingNavbar from '@/components/src/FloatingNavbar';
 
-type Plan = {
-  id: number;
-  title: string;
-  level: string;
-  duration: string;
-  progress: number;
-  image: string;
-  workouts: number;
-};
-
-const plans: Plan[] = [
+// Dummy data with schedule added
+const plans = [
   {
     id: 1,
     title: 'Beginner Strength',
     level: 'Beginner',
     duration: '4 Weeks',
-    workouts: 12,
-    progress: 20,
+    progress: 25,
     image:
       'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=500&auto=format&fit=crop',
+    schedule: ['Push Day', 'Pull Day', 'Leg Day', 'Rest'],
   },
   {
     id: 2,
     title: 'Fat Burn Program',
     level: 'Intermediate',
     duration: '6 Weeks',
-    workouts: 24,
     progress: 40,
     image:
       'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=500&auto=format&fit=crop',
+    schedule: ['HIIT Cardio', 'Abs Burner', 'Lower Body', 'Active Rest'],
   },
   {
     id: 3,
     title: 'Muscle Builder',
     level: 'Advanced',
     duration: '8 Weeks',
-    workouts: 32,
     progress: 10,
     image:
       'https://images.unsplash.com/photo-1621750627159-cf77b0b91aac?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8bXVzY2xlfGVufDB8fDB8fHww',
+    schedule: ['Chest/Back', 'Shoulders/Arms', 'Legs Heavy', 'Rest Day'],
   },
 ];
 
 export default function PlansPage() {
+  const [expandedPlan, setExpandedPlan] = useState<number | null>(null);
+  const [isStarting, setIsStarting] = useState<number | null>(null);
+
+  const handleStartTraining = (id: number) => {
+    setIsStarting(id);
+    // Simulate plan activation
+    setTimeout(() => setIsStarting(null), 2000);
+  };
+
   return (
     <>
       <div className="min-h-screen bg-white text-slate-900 pb-32 selection:bg-[#155DFC]/20">
@@ -72,115 +73,187 @@ export default function PlansPage() {
           <header className="flex justify-between items-end mb-10">
             <div>
               <h1 className="text-3xl font-black tracking-tight text-slate-900 leading-none">
-                WORKOUT
+                TRAINING <span className="text-[#155DFC]">PLANS</span>
               </h1>
-              <p className="text-[#155DFC] text-xs font-bold uppercase tracking-widest mt-2">
-                Personalized Plans
+              <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mt-2">
+                Curated for <span className="text-slate-900">Rajesh</span>
               </p>
             </div>
-            <div className="bg-slate-50 p-2 rounded-xl border border-slate-100">
-              <Target className="text-slate-400" size={20} />
-            </div>
+            <motion.div
+              whileTap={{ rotate: 180 }}
+              className="bg-slate-50 p-2.5 rounded-2xl border border-slate-100 shadow-sm"
+            >
+              <Target className="text-[#155DFC]" size={22} />
+            </motion.div>
           </header>
 
-          {/* ACTIVE PLAN CARD - PREMIUM DARK LOOK */}
-          <div className="relative mb-12 overflow-hidden bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-[#155DFC]/20">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#155DFC] blur-[80px] opacity-40" />
+          {/* ACTIVE PLAN - PREMIUM LOOK */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="relative mb-12 overflow-hidden bg-slate-950 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-[#155DFC]/30"
+          >
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#155DFC] blur-[100px] opacity-30" />
 
             <div className="relative z-10">
               <div className="flex justify-between items-center mb-6">
-                <Badge className="bg-[#155DFC] hover:bg-[#155DFC] text-[9px] uppercase font-black tracking-wider px-3 py-1 rounded-lg">
-                  Current
+                <Badge className="bg-[#155DFC] text-[9px] font-black px-3 py-1">
+                  CURRENT PLAN
                 </Badge>
-                <div className="flex items-center gap-1 text-orange-400">
-                  <Flame size={14} fill="currentColor" />
-                  <span className="text-xs font-bold">5 Day Streak</span>
+                <div className="flex items-center gap-1.5 text-orange-400">
+                  <Trophy size={14} />
+                  <span className="text-[10px] font-bold uppercase tracking-tighter">
+                    Week 1 / Day 4
+                  </span>
                 </div>
               </div>
 
-              <h2 className="text-2xl font-black tracking-tight mb-1">
+              <h2 className="text-2xl font-black italic tracking-tighter mb-6 uppercase">
                 Beginner Strength
               </h2>
-              <p className="text-slate-400 text-xs font-medium mb-6 italic">
-                Week 1 of 4 • 3 Workouts left
-              </p>
 
-              <div className="space-y-3">
-                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
-                  <span>Overall Progress</span>
+              <div className="space-y-4">
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                  <span>Progress</span>
                   <span className="text-[#155DFC]">25%</span>
                 </div>
-                <div className="h-2.5 w-full bg-white/10 rounded-full overflow-hidden">
+                <div className="h-3 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-0.5">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: '25%' }}
-                    transition={{ duration: 1 }}
-                    className="h-full bg-[#155DFC] shadow-[0_0_15px_#155DFC]"
+                    className="h-full bg-gradient-to-r from-[#155DFC] to-blue-400 rounded-full shadow-[0_0_20px_#155DFC]"
                   />
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* PLANS LIST */}
+          {/* DISCOVER SECTION */}
           <div className="space-y-6">
-            <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">
-              Discover New Plans
+            <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] px-1">
+              Select Your Path
             </h3>
 
             <div className="space-y-4">
-              {plans.map((plan, index) => (
-                <motion.div
-                  key={plan.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card className="rounded-[2rem] border-slate-100 shadow-sm hover:shadow-md transition-all group overflow-hidden border-2 hover:border-[#155DFC]/20">
+              {plans.map((plan) => (
+                <motion.div key={plan.id} layout>
+                  <Card
+                    className={`rounded-[2.5rem] border-slate-100 transition-all overflow-hidden ${
+                      expandedPlan === plan.id
+                        ? 'ring-2 ring-[#155DFC] shadow-2xl'
+                        : 'shadow-sm'
+                    }`}
+                  >
                     <CardContent className="p-0">
-                      <div className="flex p-4 gap-5">
-                        <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-2xl">
+                      <div
+                        className="flex p-5 gap-5 cursor-pointer"
+                        onClick={() =>
+                          setExpandedPlan(
+                            expandedPlan === plan.id ? null : plan.id,
+                          )
+                        }
+                      >
+                        <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-[1.8rem]">
                           <img
                             src={plan.image}
-                            alt={plan.title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            className="w-full h-full object-cover"
+                            alt=""
                           />
-                          <div className="absolute inset-0 bg-black/20" />
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <motion.div
+                              animate={{
+                                rotate: expandedPlan === plan.id ? 180 : 0,
+                              }}
+                            >
+                              <ChevronDown
+                                className="text-white opacity-60"
+                                size={20}
+                              />
+                            </motion.div>
+                          </div>
                         </div>
 
                         <div className="flex-1 py-1">
-                          <div className="flex justify-between items-start">
-                            <h4 className="font-black text-slate-800 text-base leading-tight group-hover:text-[#155DFC] transition-colors uppercase italic">
-                              {plan.title}
-                            </h4>
-                          </div>
-
-                          <div className="flex gap-2 mt-2">
-                            <Badge className="bg-[#155DFC]/10 text-[#155DFC] border-none text-[8px] font-black uppercase px-2 py-0.5 rounded-md">
+                          <h4 className="font-black text-slate-900 text-lg italic uppercase leading-none mb-3">
+                            {plan.title}
+                          </h4>
+                          <div className="flex gap-2">
+                            <Badge
+                              variant="secondary"
+                              className="bg-slate-50 text-slate-500 text-[8px] font-black rounded-md px-2"
+                            >
+                              {plan.duration}
+                            </Badge>
+                            <Badge
+                              variant="secondary"
+                              className="bg-[#155DFC]/5 text-[#155DFC] text-[8px] font-black rounded-md px-2"
+                            >
                               {plan.level}
                             </Badge>
-                            <Badge className="bg-slate-50 text-slate-500 border-none text-[8px] font-black uppercase px-2 py-0.5 rounded-md flex items-center gap-1">
-                              <Clock size={10} /> {plan.duration}
-                            </Badge>
-                          </div>
-
-                          <div className="mt-4 flex items-center gap-3">
-                            <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-slate-300 group-hover:bg-[#155DFC] transition-all"
-                                style={{ width: `${plan.progress}%` }}
-                              />
-                            </div>
-                            <span className="text-[9px] font-black text-slate-400">
-                              {plan.progress}%
-                            </span>
                           </div>
                         </div>
                       </div>
 
-                      <Button className="w-full h-12 bg-white hover:bg-[#155DFC] text-slate-900 hover:text-white rounded-none border-t border-slate-50 transition-all font-black text-[10px] uppercase tracking-widest gap-2">
-                        Start Training <Zap size={14} fill="currentColor" />
-                      </Button>
+                      {/* EXPANDED DETAILS */}
+                      <AnimatePresence>
+                        {expandedPlan === plan.id && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="px-6 pb-6"
+                          >
+                            <div className="pt-2 pb-6 border-t border-slate-50">
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">
+                                Plan Overview
+                              </p>
+                              <div className="grid grid-cols-2 gap-3">
+                                {plan.schedule.map((item, i) => (
+                                  <div
+                                    key={i}
+                                    className="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100"
+                                  >
+                                    <CheckCircle2
+                                      size={14}
+                                      className={
+                                        i === 3
+                                          ? 'text-slate-300'
+                                          : 'text-[#155DFC]'
+                                      }
+                                    />
+                                    <span className="text-[10px] font-bold text-slate-700 uppercase italic">
+                                      {item}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            <Button
+                              onClick={() => handleStartTraining(plan.id)}
+                              disabled={isStarting !== null}
+                              className="w-full h-14 bg-[#155DFC] hover:bg-blue-700 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-[#155DFC]/20 gap-3 transition-all active:scale-95"
+                            >
+                              {isStarting === plan.id ? (
+                                <motion.div
+                                  animate={{ rotate: 360 }}
+                                  transition={{
+                                    repeat: Infinity,
+                                    duration: 1,
+                                    ease: 'linear',
+                                  }}
+                                >
+                                  <Zap size={18} fill="currentColor" />
+                                </motion.div>
+                              ) : (
+                                <>
+                                  Switch To This Plan{' '}
+                                  <Zap size={16} fill="currentColor" />
+                                </>
+                              )}
+                            </Button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </CardContent>
                   </Card>
                 </motion.div>
